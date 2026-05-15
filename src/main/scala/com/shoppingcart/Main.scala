@@ -1,4 +1,5 @@
 package com.shoppingcart
+import cats.effect
 
 final case class AppConfig(target: String)
 
@@ -12,3 +13,4 @@ object Main:
 
   @main def run(): Unit =
     Console.println(program(AppConfig("world")))
+
