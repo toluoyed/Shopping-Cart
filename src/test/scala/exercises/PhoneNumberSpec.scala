@@ -1,4 +1,4 @@
-package valueclasses
+package exercises
 
 import munit.FunSuite
 
