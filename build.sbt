@@ -11,6 +11,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core"   % CatsVersion,
       "org.typelevel" %% "cats-effect" % CatsEffectVersion,
+      "dev.profunktor" %% "redis4cats-effects" % "2.0.3",
       "eu.timepit"    %% "refined"       % "0.11.2",
       "io.monix"      %% "newtypes-core" % "0.3.0",
       "org.scalameta" %% "munit"         % "1.0.0" % Test
