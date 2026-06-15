@@ -1,8 +1,8 @@
 package com.shoppingcart.domains
 
-import com.shoppingcart.models.{Category, CategoryId}
+import com.shoppingcart.models.{Category, CategoryId, CategoryName}
 
 trait Categories[F[_]] {
-  def getAll: F[List[Category]]
-  def create(category: CategoryId): F[Unit]
+  def findAll: F[List[Category]]
+  def create(name: CategoryName): F[CategoryId]
 }

@@ -1,10 +1,8 @@
 package com.shoppingcart.domains
 
-import com.shoppingcart.models.{Brand, BrandId}
-
-import java.util.UUID
+import com.shoppingcart.models.{Brand, BrandId, BrandName}
 
 trait Brands[F[_]] {
-  def findAll:F[List[Brand]]
-  def create(brand: BrandId) : F[BrandId]
+  def findAll: F[List[Brand]]
+  def create(name: BrandName): F[BrandId]
 }

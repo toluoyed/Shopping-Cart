@@ -1,13 +1,13 @@
 package com.shoppingcart.domains
 
-import com.shoppingcart.models.{BrandName, CreateItem, Item, ItemId}
+import com.shoppingcart.models.{BrandName, CreateItem, Item, ItemId, UpdateItem}
 
 trait Items[F[_]] {
 
   def findAll: F[List[Item]]
   def findBy(brand: BrandName): F[List[Item]]
-  def findByItemId(itemId: ItemId): F[List[Item]]
-  def create(item: CreateItem) : F[Item]
-  def update(itemId: ItemId, item: Item): F[Item]
+  def findById(itemId: ItemId): F[Option[Item]]
+  def create(item: CreateItem): F[ItemId]
+  def update(item: UpdateItem): F[Unit]
 
 }
