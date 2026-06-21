@@ -4,11 +4,13 @@ import cats.Monad
 import cats.syntax.either.*
 import com.shoppingcart.domains.Items
 import com.shoppingcart.models.BrandName
+import com.shoppingcart.models.JsonCodecs.given
 import eu.timepit.refined.api.Refined
 import eu.timepit.refined.api.Validate
 import eu.timepit.refined.refineV
 import eu.timepit.refined.types.all.NonEmptyString
 import org.http4s.{HttpRoutes, ParseFailure, QueryParamDecoder}
+import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.Router
 

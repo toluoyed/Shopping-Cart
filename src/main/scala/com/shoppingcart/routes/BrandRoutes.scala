@@ -2,7 +2,9 @@ package com.shoppingcart.routes
 
 import cats.Monad
 import com.shoppingcart.domains.Brands
+import com.shoppingcart.models.JsonCodecs.given
 import org.http4s.HttpRoutes
+import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.Router
 
