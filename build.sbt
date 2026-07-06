@@ -10,6 +10,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "shopping-cart",
     version := "0.1.0-SNAPSHOT",
+    Compile / mainClass := Some("com.shoppingcart.Main"),
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core"   % CatsVersion,
       "org.typelevel" %% "cats-effect" % CatsEffectVersion,

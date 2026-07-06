@@ -12,7 +12,7 @@ final case class HttpApi[F[_]: Concurrent](
     brands: Brands[F],
     categories: Categories[F],
     healthCheck: HealthCheck[F],
-    items: Items[F],
+    items: Items[F], 
     orders: Orders[F],
     shoppingCart: ShoppingCart[F]
 ) {
@@ -20,7 +20,7 @@ final case class HttpApi[F[_]: Concurrent](
     AuthMiddlewares.users(auth)
 
   private val openRoutes: HttpRoutes[F] =
-    BrandRoutes[F](brands).routes <+>
+    BrandRoutes[F](brands).routes <+> 
       CategoryRoutes[F](categories).routes <+>
       HealthCheckRoutes[F](healthCheck).routes <+>
       ItemRoutes[F](items).routes

@@ -14,11 +14,6 @@ import org.http4s.circe.CirceEntityCodec.*
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.Router
 
-case class BrandParam(value: NonEmptyString) {
-  def toDomain: BrandName =
-    BrandName(value.value.toLowerCase.capitalize)
-}
-
 implicit def refinedParamDecoder[T: QueryParamDecoder, P](
                                                            implicit ev: Validate[T, P]
                                                          ): QueryParamDecoder[T Refined P] =
@@ -26,8 +21,14 @@ implicit def refinedParamDecoder[T: QueryParamDecoder, P](
     refineV[P](_).leftMap(message => ParseFailure(message, message))
   )
 
-implicit val brandParamDecoder: QueryParamDecoder[BrandParam] =
+implicit val brandParamDecoder: QueryParamDecoder[BrandParam] = 
   QueryParamDecoder[NonEmptyString].map(BrandParam(_))
+
+
+final case class BrandParam(value: NonEmptyString) {
+  def toDomain: BrandName = 
+    BrandName(value.value.toLowerCase.capitalize)
+}
 
 final case class ItemRoutes[F[_]: Monad](
                                           items: Items[F]
