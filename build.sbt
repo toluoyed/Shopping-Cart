@@ -23,6 +23,7 @@ lazy val root = (project in file("."))
       "org.http4s" %% "http4s-ember-server" % Http4sVersion,
       "io.circe" %% "circe-core" % CirceVersion,
       "io.circe" %% "circe-generic" % CirceVersion,
+      "org.typelevel" %% "doobie-core" % "1.0.0-RC13",
       "org.scalameta" %% "munit"         % "1.0.0" % Test
     )
   )
