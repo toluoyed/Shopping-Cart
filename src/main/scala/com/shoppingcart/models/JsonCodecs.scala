@@ -9,14 +9,6 @@ import java.util.UUID
 
 object JsonCodecs {
 
-  given Encoder[UserName] = Encoder[String].contramap(_.value)
-  given Decoder[UserName] = Decoder[String].map(UserName.apply)
-
-  given Encoder[Password] = Encoder[String].contramap(_.value)
-  given Decoder[Password] = Decoder[String].map(Password.apply)
-
-  given Encoder[JwtToken] = Encoder[String].contramap(_.value)
-
   given Encoder[UserId] = Encoder[String].contramap(_.value.toString)
   given Decoder[UserId] =
     Decoder[String].emap(s => Either.catchNonFatal(UserId(UUID.fromString(s))).leftMap(_.getMessage))
@@ -25,15 +17,9 @@ object JsonCodecs {
   given Decoder[BrandId] =
     Decoder[String].emap(s => Either.catchNonFatal(BrandId(UUID.fromString(s))).leftMap(_.getMessage))
 
-  given Encoder[BrandName] = Encoder[String].contramap(_.value)
-  given Decoder[BrandName] = Decoder[String].map(BrandName.apply)
-
   given Encoder[CategoryId] = Encoder[String].contramap(_.value.toString)
   given Decoder[CategoryId] =
     Decoder[String].emap(s => Either.catchNonFatal(CategoryId(UUID.fromString(s))).leftMap(_.getMessage))
-
-  given Encoder[CategoryName] = Encoder[String].contramap(_.value)
-  given Decoder[CategoryName] = Decoder[String].map(CategoryName.apply)
 
   given Encoder[ItemId] = Encoder[String].contramap(_.value.toString)
   given Decoder[ItemId] =
@@ -43,11 +29,13 @@ object JsonCodecs {
   given KeyDecoder[ItemId] = (key: String) =>
     Either.catchNonFatal(ItemId(UUID.fromString(key))).toOption
 
-  given Encoder[ItemName] = Encoder[String].contramap(_.value)
-  given Encoder[ItemDescription] = Encoder[String].contramap(_.value)
-
   given Encoder[Quantity] = Encoder[Int].contramap(_.value)
-  given Decoder[Quantity] = Decoder[Int].map(Quantity.apply)
+  given Decoder[Quantity] = Decoder[Int].emap(value =>
+    Either.cond(
+      value > 0,
+      Quantity(value),
+      "Quantity must be greater than zero"
+    ))
 
   given Encoder[OrderId] = Encoder[String].contramap(_.uuid.toString)
 
