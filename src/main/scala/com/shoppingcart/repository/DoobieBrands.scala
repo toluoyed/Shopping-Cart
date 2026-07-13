@@ -1,5 +1,6 @@
 package com.shoppingcart.repository
 
+import com.shoppingcart.domains.Brands
 import com.shoppingcart.models.{Brand, BrandId, BrandName}
 import cats.syntax.functor.*
 import doobie.ConnectionIO
@@ -7,17 +8,17 @@ import doobie.implicits.*
 
 import java.util.UUID
 
-object DoobieBrandRepository extends BrandRepository[ConnectionIO]{
+object DoobieBrands extends Brands[ConnectionIO] {
   import DoobieMappings.given
 
-  override def findAllBrands(): ConnectionIO[List[Brand]] = 
+  override def findAll: ConnectionIO[List[Brand]] =
     sql"""
       SELECT id, name
       FROM brands
       ORDER BY name
     """.query[Brand].to[List]
 
-  override def createBrand(name: BrandName): ConnectionIO[BrandId] = {
+  override def create(name: BrandName): ConnectionIO[BrandId] = {
     val id = BrandId(UUID.randomUUID())
 
     sql"""
@@ -25,5 +26,4 @@ object DoobieBrandRepository extends BrandRepository[ConnectionIO]{
       VALUES ($id, $name)
     """.update.run.as(id)
   }
-  
 }

@@ -5,6 +5,7 @@ val CatsVersion       = "2.10.0"
 val CatsEffectVersion = "3.5.4"
 val Http4sVersion = "0.23.30"
 val CirceVersion = "0.14.7"
+val DoobieVersion = "1.0.0-RC12"
 
 lazy val root = (project in file("."))
   .settings(
@@ -23,7 +24,9 @@ lazy val root = (project in file("."))
       "org.http4s" %% "http4s-ember-server" % Http4sVersion,
       "io.circe" %% "circe-core" % CirceVersion,
       "io.circe" %% "circe-generic" % CirceVersion,
-      "org.typelevel" %% "doobie-core" % "1.0.0-RC13",
+      "org.tpolecat" %% "doobie-core" % DoobieVersion,
+      "org.tpolecat" %% "doobie-postgres" % DoobieVersion,
+      "org.tpolecat" %% "doobie-hikari" % DoobieVersion,
       "org.scalameta" %% "munit"         % "1.0.0" % Test
     )
   )

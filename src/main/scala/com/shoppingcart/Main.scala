@@ -6,6 +6,7 @@ import cats.syntax.all.*
 import com.comcast.ip4s.*
 import com.shoppingcart.domains.{Auth, Brands, Categories, HealthCheck, Items, Orders, ShoppingCart as ShoppingCartService}
 import com.shoppingcart.models.*
+import com.shoppingcart.repository.{Database, DatabaseConfig, LiveBrands, LiveCategories, LiveItems}
 import com.shoppingcart.routes.HttpApi
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.implicits.*
@@ -16,25 +17,33 @@ import java.util.UUID
 object Main extends IOApp.Simple {
 
   override def run: IO[Unit] =
-    InMemoryServices.create.flatMap { services =>
-      val httpApp =
-        HttpApi[IO](
-          services.auth,
-          services.brands,
-          services.categories,
-          services.healthCheck,
-          services.items,
-          services.orders,
-          services.shoppingCart
-        ).routes.orNotFound
+    DatabaseConfig.load.flatMap { config =>
+      Database.transactor(config).use { xa =>
+        val brands = LiveBrands(xa)
+        val categories = LiveCategories(xa)
+        val items = LiveItems(xa)
 
-      EmberServerBuilder
-        .default[IO]
-        .withHost(ipv4"0.0.0.0")
-        .withPort(port"8080")
-        .withHttpApp(httpApp)
-        .build
-        .useForever
+        InMemoryServices.create(brands, categories, items).flatMap { services =>
+          val httpApp =
+            HttpApi[IO](
+              services.auth,
+              services.brands,
+              services.categories,
+              services.healthCheck,
+              services.items,
+              services.orders,
+              services.shoppingCart
+            ).routes.orNotFound
+
+          EmberServerBuilder
+            .default[IO]
+            .withHost(ipv4"0.0.0.0")
+            .withPort(port"8080")
+            .withHttpApp(httpApp)
+            .build
+            .useForever
+        }
+      }
     }
 }
 
@@ -92,22 +101,21 @@ private object InMemoryServices {
       )
     )
 
-  def create: IO[InMemoryServices] =
+  def create(
+      brandsService: Brands[IO],
+      categoriesService: Categories[IO],
+      itemsService: Items[IO]
+  ): IO[InMemoryServices] =
     (
       Ref.of[IO, Map[UserName, (User, Password)]](Map.empty),
       Ref.of[IO, Map[JwtToken, User]](Map.empty),
-      Ref.of[IO, List[Brand]](List(nike, adidas)),
-      Ref.of[IO, List[Category]](List(shoes, accessories)),
-      Ref.of[IO, List[Item]](seedItems),
       Ref.of[IO, Map[UserId, Cart]](Map.empty),
       Ref.of[IO, Map[UserId, List[Order]]](Map.empty)
-    ).mapN { case (users, tokens, brandStore, categoryStore, itemStore, carts, orderStore) =>
-      val itemsService = items(itemStore, brandStore, categoryStore)
-
+    ).mapN { case (users, tokens, carts, orderStore) =>
       InMemoryServices(
         auth(users, tokens),
-        brands(brandStore),
-        categories(categoryStore),
+        brandsService,
+        categoriesService,
         healthCheck,
         itemsService,
         orders(orderStore),
@@ -129,8 +137,8 @@ private object InMemoryServices {
             if current.contains(username) then
               current -> IO.raiseError[User](new IllegalArgumentException("User already exists"))
             else {
-              val user = User(UserId(UUID.randomUUID()), username)
-              current.updated(username, user -> password) -> IO.pure(user)
+              val createdUser = User(UserId(UUID.randomUUID()), username)
+              current.updated(username, createdUser -> password) -> IO.pure(createdUser)
             }
           }.flatten
           token <- issueToken(user)
