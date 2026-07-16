@@ -4,12 +4,14 @@ import cats.effect.IO
 import com.shoppingcart.domains.Categories
 import com.shoppingcart.models.{Category, CategoryId, CategoryName}
 import doobie.Transactor
-import doobie.implicits.*
 
 final class LiveCategories(xa: Transactor[IO]) extends Categories[IO] {
+  private val categories: Categories[IO] =
+    DoobieCategories.make[IO](xa)
+
   override def findAll: IO[List[Category]] =
-    DoobieCategories.findAll.transact(xa)
+    categories.findAll
 
   override def create(name: CategoryName): IO[CategoryId] =
-    DoobieCategories.create(name).transact(xa)
+    categories.create(name)
 }
